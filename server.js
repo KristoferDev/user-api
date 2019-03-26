@@ -16,6 +16,7 @@ app.get("/getlist", (req, res) => {
   connection.query("SELECT * FROM users", function(error, results, fields) {
     if (error) throw error;
     console.log("Result: ", results);
+    console.log(results);
     res.json(results);
   });
 });
