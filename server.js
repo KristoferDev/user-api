@@ -1,6 +1,10 @@
 const express = require("express");
+const bodyParser = require('body-parser');
 
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 var mysql = require("mysql");
 var connection = mysql.createConnection({
@@ -57,6 +61,14 @@ app.delete("/", (req, res) => {
     console.log("deleted " + results.affectedRows + " rows");
     res.json("deleted " + results.affectedRows + " rows");
   });
+});
+
+app.get('/import', (req, res, next) => {
+  res.render(path.join(__dirname, "views", "index.html"));
+});
+
+app.post('/import', (req, res, next) => {
+
 });
 
 app.post("/", (req, res) => {
