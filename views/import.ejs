@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+   <title><%= pageTitle %></title>
+</head>
+<body>
+
+   <h2>Import file</h2>
+   <!-- <form action="/imported" method="POST"> -->
+      <input type="file" name="file" id="file">
+      <button type="submit" id="import-button">Import</button>
+   
+</body>
+<script>
+   window.addEventListener('load', (event) => {
+      document.getElementById('file').addEventListener('change', readFile, false);
+
+      function readFile (evt) {
+         var files = evt.target.files;
+         var file = files[0];           
+         var reader = new FileReader();
+         reader.onload = function(event) {
+            let data = event.target.result;
+            console.log(event.target.result);
+            fetch('http://localhost:3001/imported', {
+               method: "POST", // *GET, POST, PUT, DELETE, etc.
+               mode: "cors", // no-cors, cors, *same-origin
+               cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+               credentials: "same-origin", // include, *same-origin, omit
+               headers: {
+                     "Content-Type": "application/json",
+                     // "Content-Type": "application/x-www-form-urlencoded",
+               },
+               redirect: "follow", // manual, *follow, error
+               referrer: "no-referrer", // no-referrer, *client
+               body: data, // body data type must match "Content-Type" header
+            });
+         }
+         reader.readAsText(file)
+      }
+   });
+   </script>
+</html>

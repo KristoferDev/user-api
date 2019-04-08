@@ -1,17 +1,22 @@
-const express = require("express");
-const bodyParser = require('body-parser');
+const path = require("path");
+const bodyParser = require("body-parser");
+const fs = require('fs');
 
+const express = require("express");
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.set("view engine", "ejs");
+app.set("views", "views");
+
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+app.use(bodyParser.json({ limit: '10mb' }));
 
 var mysql = require("mysql");
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
-  database: "user-api"
+  password: "kallebassi1",
+  database: "rent-me-direct"
 });
 
 connection.connect();
@@ -64,11 +69,34 @@ app.delete("/", (req, res) => {
 });
 
 app.get('/import', (req, res, next) => {
-  res.render(path.join(__dirname, "views", "index.html"));
+  res.render(path.join(__dirname, "views", "import.ejs"), {pageTitle: 'Import users'});
 });
 
-app.post('/import', (req, res, next) => {
+app.post('/imported', urlencodedParser, function (req, res, next) {
+  var jsondata = req.body;
+  var values = [];
+  for(var i = 0; i < jsondata.length; i++) {
+    if (jsondata[i].gender == 'Male') {
+      jsondata[i].gender = 'm';
+    } else if (jsondata[i].gender == 'Female') {
+      jsondata[i].gender = 'f';
+    } else {
+      jsondata[i].gender = 'u';
+    }
+    values.push([jsondata[i].ip_address,jsondata[i].last_name,jsondata[i].first_name,jsondata[i].Mobile,jsondata[i].email,jsondata[i].gender,jsondata[i].City,jsondata[i].job_title]);
+  };
 
+  connection.query('INSERT INTO users (password, last_name, first_name, mobile, email, gender, city, title) VALUES ?', [values], function(err, result) {
+    console.log('value', values);
+    console.log('err', err);
+    console.log('result', result);
+    if(err) {
+      res.send('Error');
+    }
+    else {
+      res.send('Success');
+    }
+  })
 });
 
 app.post("/", (req, res) => {
